@@ -8,19 +8,24 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Hermes.Models;
+using Hermes.Helpers;
 
 namespace Hermes.Controllers
 {
     [Authorize]
+    [ApiController]
+    [Route("[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly DataContextDapper _dapper;
         private readonly IConfiguration _config;
+        private readonly AuthHelper _authHelper;
 
         public AuthController(IConfiguration config)
         {
             _dapper = new DataContextDapper(config);
             _config = config;
+            _authHelper = new AuthHelper(config);
         }
 
         [AllowAnonymous]
@@ -69,7 +74,7 @@ namespace Hermes.Controllers
                     int userId = _dapper.LoadDataSingle<int>(userIdSql);
                     return Ok(new Dictionary<string, string>
                     {
-                        {"token", CreateToken(userId)}
+                        {"token", _authHelper.CreateToken(userId)}
                     });
                 }
                 return StatusCode(401, "Incorrect password!");
@@ -83,33 +88,7 @@ namespace Hermes.Controllers
             string userIdSql = $"SELECT id FROM users WHERE id = '{User.FindFirst("userId")?.Value}'";
 
             int userId = _dapper.LoadDataSingle<int>(userIdSql);
-            return CreateToken(userId);
-        }
-
-        private string CreateToken(int userId)
-        {
-            Claim[] claims = new Claim[]
-            {
-                new Claim("userId", userId.ToString())
-            };
-
-            string? tokenKeyString = _config.GetSection("AppSettings:TokenKey").Value;
-            SymmetricSecurityKey tokenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKeyString != null ? tokenKeyString : ""));
-
-            SigningCredentials credentials = new SigningCredentials(tokenKey, SecurityAlgorithms.HmacSha512Signature);
-
-            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(claims),
-                SigningCredentials = credentials,
-                Expires = DateTime.Now.AddHours(8),
-            };
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            SecurityToken token = tokenHandler.CreateToken(descriptor);
-
-            return tokenHandler.WriteToken(token);
+            return _authHelper.CreateToken(userId);
         }
     }
 }
