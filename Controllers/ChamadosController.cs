@@ -36,5 +36,16 @@ namespace Hermes.Controllers
             IEnumerable<ChamadoModel> chamadoByUser = _dapper.LoadData<ChamadoModel>($"select * from chamados where user_id = {User.FindFirst("userId")?.Value}");
             return chamadoByUser;
         }
+
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] ChamadoModel chamadoCreate)
+        {
+            string query = $"insert into chamados values(descricao = '{chamadoCreate.Descricao}')";
+            if (_dapper.ExecuteSql(query))
+            {
+                return StatusCode(200, "Chamado created successfully");
+            }
+            return StatusCode(500, "Error in creating chamado");
+        }
     }
 }
