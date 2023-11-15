@@ -2,12 +2,7 @@
 using Hermes.Dtos;
 using static BCrypt.Net.BCrypt;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
-using Hermes.Models;
 using Hermes.Helpers;
 
 namespace Hermes.Controllers
@@ -18,13 +13,11 @@ namespace Hermes.Controllers
     public class AuthController : ControllerBase
     {
         private readonly DataContextDapper _dapper;
-        private readonly IConfiguration _config;
         private readonly AuthHelper _authHelper;
 
         public AuthController(IConfiguration config)
         {
             _dapper = new DataContextDapper(config);
-            _config = config;
             _authHelper = new AuthHelper(config);
         }
 
@@ -41,16 +34,16 @@ namespace Hermes.Controllers
                 {
                     var hashedPassword = HashPassword(userForRegistrationDto.Password);
 
-                    if (_dapper.ExecuteSql($"INSERT INTO users (name, email, password) VALUES('{userForRegistrationDto.Name}', '{userForRegistrationDto.Email}', '{hashedPassword}')"))
+                    if (_dapper.ExecuteSql($"INSERT INTO users (name, email, is_active, password) VALUES('{userForRegistrationDto.Name}', '{userForRegistrationDto.Email}', true, '{hashedPassword}')"))
                     {
                         return Ok();
                     }
 
-                    throw new Exception("Error in registering user");
+                    return StatusCode(500, "Error in registering user");
                 }
-                throw new Exception("This user already exists");
+                return StatusCode(401, "This user already exists");
             }
-            throw new Exception("Passwords do not match");
+            return StatusCode(401, "Passwords do not match.");
         }
 
 
@@ -59,7 +52,7 @@ namespace Hermes.Controllers
         public IActionResult Login([FromBody]UserForLoginDto userForLoginDto)
         {
 
-            string query = $"SELECT * FROM users WHERE email = '{userForLoginDto.Email}'";
+            string query = $"SELECT * FROM users WHERE email = '{userForLoginDto.Email}' and is_active is true";
             IEnumerable<string> ExistingUser = _dapper.LoadData<string>(query);
 
 
@@ -79,7 +72,7 @@ namespace Hermes.Controllers
                 }
                 return StatusCode(401, "Incorrect password!");
             }
-            throw new Exception("User does not exist");
+            return StatusCode(404, "User not found or inactive.");
         }
 
         [HttpGet("RefreshToken")]
