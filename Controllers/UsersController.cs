@@ -2,9 +2,11 @@
 using Hermes.Dtos;
 using Hermes.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hermes.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UserController : ControllerBase
@@ -16,6 +18,7 @@ public class UserController : ControllerBase
         _dapper = new DataContextDapper(config);
     }
 
+    [AllowAnonymous]
     [HttpGet("get_all")]
     public IEnumerable<UserModel> GetUsers()
     {

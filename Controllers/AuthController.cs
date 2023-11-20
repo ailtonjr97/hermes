@@ -34,7 +34,7 @@ namespace Hermes.Controllers
                 {
                     var hashedPassword = HashPassword(userForRegistrationDto.Password);
 
-                    if (_dapper.ExecuteSql($"INSERT INTO users (name, email, is_active, password) VALUES('{userForRegistrationDto.Name}', '{userForRegistrationDto.Email}', true, '{hashedPassword}')"))
+                    if (_dapper.ExecuteSql($"INSERT INTO users (name, email, is_active, password) VALUES('{userForRegistrationDto.Name}', '{userForRegistrationDto.Email}', 1, '{hashedPassword}')"))
                     {
                         return Ok();
                     }
@@ -52,7 +52,7 @@ namespace Hermes.Controllers
         public IActionResult Login([FromBody]UserForLoginDto userForLoginDto)
         {
 
-            string query = $"SELECT * FROM users WHERE email = '{userForLoginDto.Email}' and is_active is true";
+            string query = $"SELECT * FROM users WHERE email = '{userForLoginDto.Email}' and is_active is 1";
             IEnumerable<string> ExistingUser = _dapper.LoadData<string>(query);
 
 

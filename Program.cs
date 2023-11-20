@@ -21,7 +21,7 @@ namespace Hermes
             {
                 opt.AddPolicy("DevCors", (corsBuilder) =>
                 {
-                    corsBuilder.WithOrigins("http://localhost:8000")
+                    corsBuilder.WithOrigins("http://localhost:8000", "http://192.168.100.10:8080")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();

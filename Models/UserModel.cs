@@ -6,7 +6,7 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public int Age { get; set; }
-        public bool IsActive { get; set; }
+        public int Is_Active { get; set; }
 
         public UserModel()
         {
