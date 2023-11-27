@@ -1,4 +1,4 @@
-﻿namespace Hermes.Dtos
+﻿namespace Hermes.Dtos.Users
 {
     public partial class UserForLoginDto
     {

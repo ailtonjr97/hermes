@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Hermes.Dtos
+namespace Hermes.Dtos.Users
 {
     partial class UserForLoginConfirmationDto
     {
@@ -10,11 +10,11 @@ namespace Hermes.Dtos
         public UserForLoginConfirmationDto()
         {
 
-            if(Email == null)
+            if (Email == null)
             {
                 Email = "";
             }
-            if(Password == null)
+            if (Password == null)
             {
                 Password = "";
             }

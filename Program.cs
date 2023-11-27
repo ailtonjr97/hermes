@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using MySqlConnector;
 using System.Text;
 
 namespace Hermes
@@ -17,11 +18,12 @@ namespace Hermes
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddTransient(x => new MySqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddCors((opt) =>
             {
                 opt.AddPolicy("DevCors", (corsBuilder) =>
                 {
-                    corsBuilder.WithOrigins("http://localhost:8000", "http://192.168.100.10:8080")
+                    corsBuilder.WithOrigins("http://192.168.100.10:8080", "http://192.168.2.5:8080")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();

@@ -1,4 +1,4 @@
-﻿namespace Hermes.Dtos
+﻿namespace Hermes.Dtos.Users
 {
     public partial class UserForRegistrationDto
     {
@@ -10,19 +10,19 @@
 
         public UserForRegistrationDto()
         {
-            if(Name == null)
+            if (Name == null)
             {
                 Name = "";
             }
-            if(Email == null)
+            if (Email == null)
             {
                 Email = "";
             }
-            if(Password == null)
+            if (Password == null)
             {
                 Password = "";
             }
-            if(PasswordConfirm == null)
+            if (PasswordConfirm == null)
             {
                 PasswordConfirm = "";
             }

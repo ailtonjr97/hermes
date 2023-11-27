@@ -1,8 +1,8 @@
 ﻿using Hermes.Data;
-using Hermes.Dtos;
 using Hermes.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Hermes.Dtos.Users;
 
 namespace Hermes.Controllers;
 
@@ -20,10 +20,10 @@ public class UserController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("get_all")]
-    public IEnumerable<UserModel> GetUsers()
+    public IEnumerable<UserDto> GetUsers()
     {
         string query = "SELECT * FROM users ORDER BY id";
-        IEnumerable<UserModel> users = _dapper.LoadData<UserModel>(query);
+        IEnumerable<UserDto> users = _dapper.LoadData<UserDto>(query);
         return users;
 
     }
@@ -39,7 +39,7 @@ public class UserController : ControllerBase
     [HttpPut("edit/{id}")]
     public IActionResult EditUser([FromBody] UserDto user, int id)
     {
-        string query = $"UPDATE users SET email = '{user.Email}', age = {user.Age} WHERE id = {id}";
+        string query = $"UPDATE users SET email = '{user.Email}' WHERE id = {id}";
         if (_dapper.ExecuteSql(query))
         {
             return Ok();

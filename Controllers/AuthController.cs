@@ -1,9 +1,9 @@
 ﻿using Hermes.Data;
-using Hermes.Dtos;
 using static BCrypt.Net.BCrypt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Hermes.Helpers;
+using Hermes.Dtos.Users;
 
 namespace Hermes.Controllers
 {
