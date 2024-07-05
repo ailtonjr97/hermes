@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Hermes.Helpers;
 using Hermes.Dtos.Users;
+using Hermes.Models;
 
 namespace Hermes.Controllers
 {
@@ -23,18 +24,16 @@ namespace Hermes.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody] UserForRegistrationDto userForRegistrationDto)
+        public IActionResult Register([FromBody] UserModel userRegistration)
         {
-            if(userForRegistrationDto.Password == userForRegistrationDto.PasswordConfirm)
-            {
-                string query = $"SELECT email FROM users WHERE email = '{userForRegistrationDto.Email}'";
+                string query = $"SELECT email FROM users WHERE email = '{userRegistration.Email}'";
                 IEnumerable<string> ExistingUsers = _dapper.LoadData<string>(query);
 
                 if(ExistingUsers.Count() == 0)
                 {
-                    var hashedPassword = HashPassword(userForRegistrationDto.Password);
+                    var hashedPassword = HashPassword(userRegistration.Password);
 
-                    if (_dapper.ExecuteSql($"INSERT INTO users (name, email, is_active, password) VALUES('{userForRegistrationDto.Name}', '{userForRegistrationDto.Email}', 1, '{hashedPassword}')"))
+                    if (_dapper.ExecuteSql($"INSERT INTO users (name, email, password, salt, active, admin, jwt, intranet_id, dpo, setor) VALUES('{userRegistration.Name}', '{userRegistration.Email}', '{hashedPassword}', 10, 1, {userRegistration.Admin}, 0, 0, 0, '{userRegistration.Setor}')"))
                     {
                         return Ok();
                     }
@@ -42,8 +41,6 @@ namespace Hermes.Controllers
                     return StatusCode(500, "Error in registering user");
                 }
                 return StatusCode(401, "This user already exists");
-            }
-            return StatusCode(401, "Passwords do not match.");
         }
 
 
@@ -51,10 +48,8 @@ namespace Hermes.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody]UserForLoginDto userForLoginDto)
         {
-
-            string query = $"SELECT * FROM users WHERE email = '{userForLoginDto.Email}' and is_active is 1";
-            IEnumerable<string> ExistingUser = _dapper.LoadData<string>(query);
-
+            string query = $"SELECT * FROM users WHERE email = '{userForLoginDto.Email}' and active = 1";
+            IEnumerable<UserForLoginDto> ExistingUser = _dapper.LoadData<UserForLoginDto>(query);
 
             if (ExistingUser.Count() == 1)
             {
